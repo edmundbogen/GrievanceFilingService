@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Grievance Filing Service{% endblock %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 mb-4">File Complaints Against Real Estate Professionals</h1>
+        <p class="lead">A comprehensive service to guide you through the grievance filing process</p>
+        {% if not current_user.is_authenticated %}
+            <div class="mt-4">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-3">Get Started</a>
+                <a href="{{ url_for('education') }}" class="btn btn-outline-secondary btn-lg">Learn More</a>
+            </div>
+        {% else %}
+            <div class="mt-4">
+                <a href="{{ url_for('jurisdiction_screening') }}" class="btn btn-primary btn-lg me-3">File New Complaint</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg">View Dashboard</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-compass fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Jurisdiction Guidance</h5>
+                <p class="card-text">Determine whether to file with state boards, REALTOR® associations, or civil court.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-clock-history fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Deadline Tracking</h5>
+                <p class="card-text">Never miss a filing deadline with our automated tracking and reminder system.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark-arrow-up fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Document Organization</h5>
+                <p class="card-text">Upload and organize all required documentation in one secure location.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-pencil-square fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Complaint Drafting</h5>
+                <p class="card-text">Templates and guidance for drafting clear, effective complaints.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-book fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">NAR Code Reference</h5>
+                <p class="card-text">Easy-to-understand summaries of NAR Code of Ethics articles.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Status Tracking</h5>
+                <p class="card-text">Monitor the progress of your complaints through each stage.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h3 class="card-title">How It Works</h3>
+                <ol class="lead">
+                    <li class="mb-2"><strong>Create an Account</strong> - Register as a consumer or REALTOR®</li>
+                    <li class="mb-2"><strong>Jurisdiction Screening</strong> - Answer questions to determine proper filing location</li>
+                    <li class="mb-2"><strong>Gather Documents</strong> - Upload contracts, correspondence, and supporting evidence</li>
+                    <li class="mb-2"><strong>Draft Complaint</strong> - Use our templates to create a clear narrative</li>
+                    <li class="mb-2"><strong>Track Progress</strong> - Monitor deadlines and status updates</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-lg-10 mx-auto">
+        <div class="alert alert-warning">
+            <h5><i class="bi bi-exclamation-triangle"></i> Important Notice</h5>
+            <p class="mb-0">
+                This service provides guidance for filing grievances but does not constitute legal advice.
+                Grievance processes are administrative and cannot award money damages or enforce contracts.
+                For legal matters such as contract enforcement or monetary damages, please consult a licensed attorney.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

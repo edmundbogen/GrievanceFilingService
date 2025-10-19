@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Document - Grievance Filing Service{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-upload"></i> Upload Document</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Upload supporting documents for: <strong>{{ complaint.title }}</strong></p>
+
+                <form method="POST" action="{{ url_for('upload_document', complaint_id=complaint.id) }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Select File *</label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                        <small class="text-muted">Allowed types: PDF, DOCX, DOC, JPG, PNG, TXT (Max 16MB)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="file_type" class="form-label">Document Type *</label>
+                        <select class="form-select" id="file_type" name="file_type" required>
+                            <option value="">Select type...</option>
+                            <option value="contract">Contract/Agreement</option>
+                            <option value="listing_agreement">Listing Agreement</option>
+                            <option value="correspondence">Email/Correspondence</option>
+                            <option value="check">Check (front and back)</option>
+                            <option value="inspection_report">Inspection Report</option>
+                            <option value="appraisal">Appraisal</option>
+                            <option value="receipt">Receipt/Invoice</option>
+                            <option value="photo">Photo/Screenshot</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description (Optional)</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                                  placeholder="Brief description of this document"></textarea>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Tips for document organization:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Upload clear, readable copies</li>
+                            <li>Include both sides of checks</li>
+                            <li>Organize chronologically</li>
+                            <li>Label each document clearly</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload"></i> Upload Document
+                        </button>
+                        <a href="{{ url_for('view_complaint', complaint_id=complaint.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

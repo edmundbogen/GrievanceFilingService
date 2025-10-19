@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}New Complaint - Grievance Filing Service{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        {% if jurisdiction %}
+        <div class="alert alert-{{ 'warning' if jurisdiction.type == 'civil_court' else 'info' }} mb-4">
+            <h5><i class="bi bi-info-circle"></i> Recommended Filing Jurisdiction</h5>
+            <p class="mb-0"><strong>{{ jurisdiction.agency }}</strong> - {{ jurisdiction.message }}</p>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-file-earmark-text"></i> New Complaint Form</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('new_complaint') }}">
+
+                    <!-- Basic Information -->
+                    <h5 class="border-bottom pb-2 mb-3">Basic Information</h5>
+
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Complaint Title *</label>
+                        <input type="text" class="form-control" id="title" name="title" required
+                               placeholder="Brief description (e.g., 'Misrepresentation of Property Condition')">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="jurisdiction_type" class="form-label">Jurisdiction Type *</label>
+                            <select class="form-select" id="jurisdiction_type" name="jurisdiction_type" required>
+                                <option value="">Select...</option>
+                                <option value="state_board" {% if jurisdiction.type == 'state_board' %}selected{% endif %}>State Licensing Board</option>
+                                <option value="nar_association" {% if jurisdiction.type == 'nar_association' %}selected{% endif %}>NAR/Local REALTOR® Association</option>
+                                <option value="civil_court" {% if jurisdiction.type == 'civil_court' %}selected{% endif %}>Civil Court</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="state" class="form-label">State *</label>
+                            <select class="form-select" id="state" name="state" required>
+                                <option value="">Select state...</option>
+                                {% for state in states %}
+                                    <option value="{{ state.code }}">{{ state.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Respondent Information -->
+                    <h5 class="border-bottom pb-2 mb-3 mt-4">Respondent Information</h5>
+
+                    <div class="mb-3">
+                        <label for="respondent_name" class="form-label">Respondent Name *</label>
+                        <input type="text" class="form-control" id="respondent_name" name="respondent_name" required
+                               placeholder="Full name of person you're filing against">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="respondent_license_number" class="form-label">License Number</label>
+                            <input type="text" class="form-control" id="respondent_license_number" name="respondent_license_number"
+                                   placeholder="If known">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="respondent_brokerage" class="form-label">Brokerage/Company</label>
+                            <input type="text" class="form-control" id="respondent_brokerage" name="respondent_brokerage"
+                                   placeholder="Company name">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Is respondent a REALTOR® (NAR member)?</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="respondent_is_realtor" id="resp_realtor_yes" value="yes">
+                            <label class="form-check-label" for="resp_realtor_yes">Yes</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="respondent_is_realtor" id="resp_realtor_no" value="no" checked>
+                            <label class="form-check-label" for="resp_realtor_no">No / Unknown</label>
+                        </div>
+                    </div>
+
+                    <!-- Incident Details -->
+                    <h5 class="border-bottom pb-2 mb-3 mt-4">Incident Details</h5>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="incident_date" class="form-label">Date of Incident/Offense *</label>
+                            <input type="date" class="form-control" id="incident_date" name="incident_date" required>
+                            <small class="text-muted">Filing deadlines are calculated from this date</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="transaction_type" class="form-label">Transaction Type</label>
+                            <select class="form-select" id="transaction_type" name="transaction_type">
+                                <option value="">Select...</option>
+                                <option value="buyer">Buyer</option>
+                                <option value="seller">Seller</option>
+                                <option value="lease">Lease/Rental</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="incident_location" class="form-label">Property Address/Location</label>
+                        <input type="text" class="form-control" id="incident_location" name="incident_location"
+                               placeholder="Address where incident occurred">
+                    </div>
+
+                    <!-- Complaint Narrative -->
+                    <h5 class="border-bottom pb-2 mb-3 mt-4">Complaint Narrative</h5>
+
+                    <div class="mb-3">
+                        <label for="complaint_narrative" class="form-label">Detailed Description *</label>
+                        <textarea class="form-control" id="complaint_narrative" name="complaint_narrative" rows="8" required
+                                  placeholder="Provide a detailed chronological account of what happened. Include:&#10;- Who was involved&#10;- What they did or didn't do&#10;- When it happened&#10;- Where it happened&#10;- Why you believe it was wrong&#10;- Any witnesses or supporting evidence"></textarea>
+                        <small class="text-muted">Be specific and include dates, names, and factual details</small>
+                    </div>
+
+                    <!-- NAR Code Violations (if applicable) -->
+                    <div id="nar_articles_section" style="display: none;">
+                        <h5 class="border-bottom pb-2 mb-3 mt-4">Alleged Code of Ethics Violations</h5>
+                        <p class="text-muted">Select all NAR Code of Ethics articles that may have been violated:</p>
+
+                        <div class="row">
+                            {% for article in nar_articles %}
+                            <div class="col-md-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="nar_articles"
+                                           value="{{ article.value }}" id="article_{{ loop.index }}">
+                                    <label class="form-check-label" for="article_{{ loop.index }}">
+                                        {{ article.label }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle"></i>
+                            Visit the <a href="{{ url_for('education') }}" target="_blank">Education page</a> to learn more about each article
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle"></i> Create Complaint
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Show/hide NAR articles section based on jurisdiction type
+    document.getElementById('jurisdiction_type').addEventListener('change', function() {
+        const narSection = document.getElementById('nar_articles_section');
+        if (this.value === 'nar_association') {
+            narSection.style.display = 'block';
+        } else {
+            narSection.style.display = 'none';
+        }
+    });
+
+    // Trigger on page load if jurisdiction is pre-selected
+    window.addEventListener('DOMContentLoaded', function() {
+        const jurisdictionType = document.getElementById('jurisdiction_type').value;
+        if (jurisdictionType === 'nar_association') {
+            document.getElementById('nar_articles_section').style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Education & Resources - Grievance Filing Service{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Education & Resources</h2>
+        <p class="lead">Learn about NAR Code of Ethics, filing processes, and best practices</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h4><i class="bi bi-info-circle"></i> Understanding the Complaint Process</h4>
+                <p>Filing a grievance against a real estate professional involves understanding the difference between:</p>
+                <ul>
+                    <li><strong>Ethics Violations</strong> - Violations of NAR Code of Ethics (file with local REALTOR® association)</li>
+                    <li><strong>License Law Violations</strong> - Violations of state real estate regulations (file with state licensing board)</li>
+                    <li><strong>Contract Disputes</strong> - Breach of agreement or damages (consult attorney or file in civil court)</li>
+                </ul>
+                <p class="mb-0"><strong>Important:</strong> State boards and REALTOR® associations cannot award monetary damages or enforce contracts. They can only discipline licenses or memberships.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- NAR Code of Ethics Articles -->
+<div class="row">
+    <div class="col">
+        <h3 class="mb-4">NAR Code of Ethics Articles</h3>
+
+        <div class="accordion" id="narCodeAccordion">
+            {% for article_num, article_data in nar_articles.items() %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ loop.index }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapse{{ loop.index }}" aria-expanded="false">
+                        <strong>{{ article_num }}: {{ article_data.title }}</strong>
+                    </button>
+                </h2>
+                <div id="collapse{{ loop.index }}" class="accordion-collapse collapse"
+                     aria-labelledby="heading{{ loop.index }}" data-bs-parent="#narCodeAccordion">
+                    <div class="accordion-body">
+                        <p><strong>Summary:</strong> {{ article_data.summary }}</p>
+
+                        <h6 class="mt-3">Common Violations:</h6>
+                        <ul>
+                            {% for violation in article_data.common_violations %}
+                            <li>{{ violation }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Additional Resources -->
+<div class="row mt-5">
+    <div class="col">
+        <h3 class="mb-4">Additional Resources</h3>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-calendar-check"></i> Filing Deadlines</h5>
+                        <ul class="small">
+                            <li><strong>NAR Ethics:</strong> 180 days after offense or transaction close</li>
+                            <li><strong>Kentucky:</strong> 1 year</li>
+                            <li><strong>Florida:</strong> 2 years (varies by type)</li>
+                            <li><strong>Colorado:</strong> 1 year</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-file-earmark-text"></i> Required Documents</h5>
+                        <ul class="small">
+                            <li>All contracts and agreements</li>
+                            <li>Correspondence (emails, letters)</li>
+                            <li>Checks (front and back copies)</li>
+                            <li>Listing agreements</li>
+                            <li>Supporting evidence</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-lightbulb"></i> Best Practices</h5>
+                        <ul class="small">
+                            <li>Gather all documentation early</li>
+                            <li>Write a clear chronological narrative</li>
+                            <li>Include specific dates and names</li>
+                            <li>Keep copies of everything</li>
+                            <li>Meet all deadlines</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Timeline Expectations -->
+<div class="row mt-4">
+    <div class="col-lg-10 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Process Timelines</h5>
+            </div>
+            <div class="card-body">
+                <h6>State Board Investigations:</h6>
+                <ul>
+                    <li><strong>Colorado:</strong> Aims for 240 days</li>
+                    <li><strong>Most States:</strong> 6-12 months typical</li>
+                </ul>
+
+                <h6 class="mt-3">NAR Ethics Process:</h6>
+                <ul>
+                    <li><strong>Grievance Committee Review:</strong> 2-4 weeks</li>
+                    <li><strong>Mediation/Ombudsman:</strong> Variable (if offered)</li>
+                    <li><strong>Professional Standards Hearing:</strong> 1-3 months after filing</li>
+                </ul>
+
+                <p class="alert alert-warning mb-0 mt-3">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Note:</strong> Timelines vary by jurisdiction and case complexity. These are estimates only.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Helpful Links -->
+<div class="row mt-4 mb-5">
+    <div class="col-lg-10 mx-auto">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5><i class="bi bi-link-45deg"></i> Helpful External Resources</h5>
+                <ul class="mb-0">
+                    <li><a href="https://www.nar.realtor/about-nar/governing-documents/the-code-of-ethics" target="_blank">NAR Code of Ethics (Official)</a></li>
+                    <li><a href="https://www.nar.realtor/about-nar/governing-documents/professional-standards" target="_blank">NAR Professional Standards</a></li>
+                    <li>Your state's real estate commission website (verify license status)</li>
+                    <li>Your local REALTOR® association (for ombudsman services)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

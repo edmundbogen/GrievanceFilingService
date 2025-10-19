@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Jurisdiction Screening - Grievance Filing Service{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-compass"></i> Jurisdiction Screening</h4>
+            </div>
+            <div class="card-body">
+                <p class="lead">Answer these questions to determine where to file your complaint:</p>
+
+                <form method="POST" action="{{ url_for('jurisdiction_screening') }}">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">1. Is the person you're filing against a REALTOR® (NAR member)?</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="is_realtor" id="is_realtor_yes" value="yes" required>
+                            <label class="form-check-label" for="is_realtor_yes">
+                                Yes, they are a REALTOR® member
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="is_realtor" id="is_realtor_no" value="no">
+                            <label class="form-check-label" for="is_realtor_no">
+                                No, or I'm not sure
+                            </label>
+                        </div>
+                        <small class="text-muted">REALTOR® members belong to the National Association of REALTORS®</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">2. What is the primary nature of your complaint?</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="violation_type" id="ethics_violation" value="ethics_violation" required>
+                            <label class="form-check-label" for="ethics_violation">
+                                Ethics violation (dishonesty, misrepresentation, unfair practice)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="violation_type" id="license_violation" value="license_violation">
+                            <label class="form-check-label" for="license_violation">
+                                License law violation (unlicensed practice, fraud, incompetence)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="violation_type" id="contract_dispute" value="contract_dispute">
+                            <label class="form-check-label" for="contract_dispute">
+                                Contract dispute or breach of agreement
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="state" class="form-label fw-bold">3. In which state did the incident occur?</label>
+                        <select class="form-select" id="state" name="state" required>
+                            <option value="">Select state...</option>
+                            {% for state in states %}
+                                <option value="{{ state.code }}">{{ state.name }}</option>
+                            {% endfor %}
+                            <option value="OTHER">Other / Not Listed</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">4. Is there a written contract involved?</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="has_contract" id="has_contract_yes" value="yes" required>
+                            <label class="form-check-label" for="has_contract_yes">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="has_contract" id="has_contract_no" value="no">
+                            <label class="form-check-label" for="has_contract_no">
+                                No
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">5. Are you seeking monetary damages or contract enforcement?</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="seeks_damages" id="seeks_damages_yes" value="yes" required>
+                            <label class="form-check-label" for="seeks_damages_yes">
+                                Yes, I want money back or contract enforcement
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="seeks_damages" id="seeks_damages_no" value="no">
+                            <label class="form-check-label" for="seeks_damages_no">
+                                No, I want to report the violation
+                            </label>
+                        </div>
+                        <small class="text-muted">Note: State boards and REALTOR® associations cannot award money or enforce contracts</small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>What happens next?</strong>
+                        Based on your answers, we'll direct you to the appropriate filing jurisdiction and provide specific guidance.
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-arrow-right-circle"></i> Continue to Complaint Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

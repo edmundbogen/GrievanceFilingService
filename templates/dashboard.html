@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Grievance Filing Service{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Welcome, {{ current_user.first_name }}!</h2>
+        <p class="text-muted">Manage your complaints and track filing deadlines</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('jurisdiction_screening') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> New Complaint
+        </a>
+    </div>
+</div>
+
+{% if complaints %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-folder"></i> Your Complaints</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Jurisdiction</th>
+                                    <th>Filing Deadline</th>
+                                    <th>Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for complaint in complaints %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ complaint.title }}</strong><br>
+                                        <small class="text-muted">vs. {{ complaint.respondent_name }}</small>
+                                    </td>
+                                    <td>
+                                        {% if complaint.status == 'draft' %}
+                                            <span class="badge bg-secondary">Draft</span>
+                                        {% elif complaint.status == 'submitted' %}
+                                            <span class="badge bg-primary">Submitted</span>
+                                        {% elif complaint.status == 'under_review' %}
+                                            <span class="badge bg-info">Under Review</span>
+                                        {% elif complaint.status == 'closed' %}
+                                            <span class="badge bg-success">Closed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if complaint.jurisdiction_type == 'state_board' %}
+                                            <i class="bi bi-building"></i> State Board
+                                        {% elif complaint.jurisdiction_type == 'nar_association' %}
+                                            <i class="bi bi-people"></i> NAR Association
+                                        {% elif complaint.jurisdiction_type == 'civil_court' %}
+                                            <i class="bi bi-bank"></i> Civil Court
+                                        {% endif %}
+                                        {% if complaint.state %}
+                                            <br><small class="text-muted">{{ complaint.state }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if complaint.filing_deadline %}
+                                            {{ complaint.filing_deadline.strftime('%b %d, %Y') }}<br>
+                                            {% if complaint.deadline_info %}
+                                                <small class="text-{{ complaint.deadline_info.css_class }}">
+                                                    <strong>{{ complaint.deadline_info.message }}</strong>
+                                                </small>
+                                            {% endif %}
+                                        {% else %}
+                                            <small class="text-muted">Not set</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ complaint.updated_at.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('view_complaint', complaint_id=complaint.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card text-center">
+                <div class="card-body py-5">
+                    <i class="bi bi-inbox fs-1 text-muted mb-3"></i>
+                    <h4>No Complaints Yet</h4>
+                    <p class="text-muted">Get started by filing your first complaint</p>
+                    <a href="{{ url_for('jurisdiction_screening') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> File New Complaint
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark-text fs-2 text-primary"></i>
+                <h5 class="mt-2">{{ complaints|length }}</h5>
+                <p class="text-muted mb-0">Total Complaints</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <i class="bi bi-hourglass-split fs-2 text-warning"></i>
+                <h5 class="mt-2">{{ complaints|selectattr('status', 'equalto', 'draft')|list|length }}</h5>
+                <p class="text-muted mb-0">Drafts</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <i class="bi bi-check-circle fs-2 text-success"></i>
+                <h5 class="mt-2">{{ complaints|selectattr('status', 'equalto', 'submitted')|list|length }}</h5>
+                <p class="text-muted mb-0">Submitted</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

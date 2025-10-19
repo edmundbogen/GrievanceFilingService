@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}{{ complaint.title }} - Grievance Filing Service{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Deadline Alert -->
+{% if deadline_info %}
+<div class="row mb-4">
+    <div class="col">
+        <div class="deadline-status {{ deadline_info.css_class }}">
+            <i class="bi bi-{% if deadline_info.urgency == 'critical' %}exclamation-triangle{% elif deadline_info.urgency == 'high' %}clock{% else %}info-circle{% endif %}"></i>
+            <strong>Filing Deadline:</strong> {{ complaint.filing_deadline.strftime('%B %d, %Y') }} - {{ deadline_info.message }}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ complaint.title }}</h4>
+                <span class="badge bg-{% if complaint.status == 'draft' %}secondary{% elif complaint.status == 'submitted' %}primary{% elif complaint.status == 'under_review' %}info{% else %}success{% endif %}">
+                    {{ complaint.status|title }}
+                </span>
+            </div>
+            <div class="card-body">
+                <h6 class="text-muted mb-3">Respondent Information</h6>
+                <p>
+                    <strong>Name:</strong> {{ complaint.respondent_name }}<br>
+                    {% if complaint.respondent_license_number %}
+                        <strong>License #:</strong> {{ complaint.respondent_license_number }}<br>
+                    {% endif %}
+                    {% if complaint.respondent_brokerage %}
+                        <strong>Brokerage:</strong> {{ complaint.respondent_brokerage }}<br>
+                    {% endif %}
+                    <strong>REALTOR® Member:</strong> {{ 'Yes' if complaint.respondent_is_realtor else 'No' }}
+                </p>
+
+                <hr>
+
+                <h6 class="text-muted mb-3">Incident Details</h6>
+                <p>
+                    <strong>Date:</strong> {{ complaint.incident_date.strftime('%B %d, %Y') if complaint.incident_date else 'Not specified' }}<br>
+                    {% if complaint.incident_location %}
+                        <strong>Location:</strong> {{ complaint.incident_location }}<br>
+                    {% endif %}
+                    {% if complaint.transaction_type %}
+                        <strong>Transaction Type:</strong> {{ complaint.transaction_type|title }}<br>
+                    {% endif %}
+                </p>
+
+                <hr>
+
+                <h6 class="text-muted mb-3">Complaint Narrative</h6>
+                <div class="bg-light p-3 rounded">
+                    {{ complaint.complaint_narrative|replace('\n', '<br>')|safe }}
+                </div>
+
+                {% if alleged_violations %}
+                <hr>
+                <h6 class="text-muted mb-3">Alleged NAR Code Violations</h6>
+                {% for violation in alleged_violations %}
+                <div class="alert alert-warning mb-2">
+                    <strong>{{ violation.number }}: {{ violation.data.title }}</strong><br>
+                    <small>{{ violation.data.summary }}</small>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-files"></i> Documents</h5>
+                <a href="{{ url_for('upload_document', complaint_id=complaint.id) }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-upload"></i> Upload
+                </a>
+            </div>
+            <div class="card-body">
+                {% if complaint.documents %}
+                <div class="list-group list-group-flush">
+                    {% for doc in complaint.documents %}
+                    <div class="list-group-item d-flex justify-content-between align-items-start">
+                        <div>
+                            <i class="bi bi-file-earmark-pdf"></i>
+                            <strong>{{ doc.original_filename }}</strong><br>
+                            <small class="text-muted">
+                                {{ doc.file_type|title if doc.file_type else 'Document' }} •
+                                Uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}
+                            </small>
+                            {% if doc.description %}
+                            <br><small>{{ doc.description }}</small>
+                            {% endif %}
+                        </div>
+                        <span class="badge bg-secondary">{{ (doc.file_size / 1024)|round|int }} KB</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">
+                    <i class="bi bi-inbox"></i> No documents uploaded yet
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-journal-text"></i> Notes & Updates</h5>
+            </div>
+            <div class="card-body">
+                {% if complaint.notes %}
+                <div class="mb-3">
+                    {% for note in complaint.notes %}
+                    <div class="mb-2 p-2 {% if note.note_type == 'system' %}bg-light{% else %}border-start border-primary border-3 ps-3{% endif %} rounded">
+                        <small class="text-muted">{{ note.created_at.strftime('%b %d, %Y %I:%M %p') }}</small>
+                        {% if note.note_type == 'system' %}
+                        <small class="badge bg-secondary">System</small>
+                        {% endif %}
+                        <p class="mb-0 mt-1">{{ note.content }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('add_note', complaint_id=complaint.id) }}">
+                    <div class="mb-2">
+                        <textarea class="form-control" name="content" rows="3" placeholder="Add a note or update..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add Note
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Jurisdiction Info -->
+        {% if jurisdiction_info %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-building"></i> Filing Agency</h6>
+            </div>
+            <div class="card-body">
+                <h6>{{ jurisdiction_info.name if jurisdiction_info.name else jurisdiction_info.get('agency', 'Filing Agency') }}</h6>
+                {% if jurisdiction_info.get('website') %}
+                <p><a href="{{ jurisdiction_info.website }}" target="_blank">{{ jurisdiction_info.website }}</a></p>
+                {% endif %}
+                {% if jurisdiction_info.get('contact') %}
+                <p class="mb-1">
+                    {% if jurisdiction_info.contact.get('phone') %}
+                    <i class="bi bi-telephone"></i> {{ jurisdiction_info.contact.phone }}<br>
+                    {% endif %}
+                    {% if jurisdiction_info.contact.get('email') %}
+                    <i class="bi bi-envelope"></i> {{ jurisdiction_info.contact.email }}
+                    {% endif %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Required Documents Checklist -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-list-check"></i> Required Documents</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {% for doc in required_docs %}
+                    <li class="mb-2">
+                        <i class="bi bi-{% if complaint.documents %}check-circle text-success{% else %}circle{% endif %}"></i>
+                        {{ doc }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Filing Checklist -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-clipboard-check"></i> Filing Steps</h6>
+            </div>
+            <div class="card-body">
+                <ol class="mb-0 ps-3">
+                    {% for step in filing_checklist %}
+                    <li class="mb-2 small">{{ step }}</li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+
+        <!-- Important Notes -->
+        {% if jurisdiction_info and jurisdiction_info.get('notes') %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Important Notes</h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0 small">
+                    {% for note in jurisdiction_info.notes %}
+                    <li class="mb-2">{{ note }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
